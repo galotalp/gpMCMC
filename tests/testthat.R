@@ -1,4 +1,4 @@
 library(testthat)
-library(proj2)
+library(gpMCMC)
 
-test_check("proj2")
+test_check("gpMCMC")

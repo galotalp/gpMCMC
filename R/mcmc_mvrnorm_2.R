@@ -1,40 +1,66 @@
-#### MCMC 4, multivariate normal distributed steps, each step is one p-dimensional vector from a multivariate normal distribution,
-# in this case the multivariate normal distribution is the laplace approximation to the variance
-# code for sampling gaussian correlation parameters in a gaussian process
-
-#read.mtx function for reading in matrix files
-# source("readmtx.R")
-# source("hessFBI.R")
-# library(MASS)
-
-#here we read in a matrix of the maximum likelihood estimators for the correlation coefficients, theta and alpha.
-# maximum likelihood estimators for theta values are used as initial estimates for the metropolis hastings algorithm
-#
-# cor.par <- read.mtx("corpar.mtx")
-# cor.par <- cor.par[,-1]
-# cor.par2 <- cor.par
-#f <- read.mtx("F.txt")
-
-
-
-
+#' This is an MCMC function with a particular multivariate normal proposal density that is only meant to be used by the gpMCMC master function
+#'
+#' MCMC 4, multivariate normal distributed steps, each step is one p-dimensional vector from a multivariate normal distribution,
+#' in this case the multivariate normal distribution is the laplace approximation to the variance
+#' code for sampling gaussian correlation parameters in a gaussian process
+#'
+#'
+#' @param nmcmc Number of mcmc samples to generate, before burning and thinning
+#' @param burn number of samples to burn
+#' @param thin keep only one of every 'thin' samples
+#' @param x predictors
+#' @param y response
+#' @param reg currently only option is "constant"
+#' @param step actually has no purpose in this function as the step length is defined by the fisher approximation to the covariance
+#' @param priortheta only currently only option is "Exp", "Higs" and "none" will also be implemented
+#'
+#' @return returns a list containing mcmc.ma (samples) and accept (acceptance rates)
+#' @export
+#'
+#' @examples
+#' nsamp <- 100
+#' burn <- 200
+#' thin <- 10
+#'
+#' n <- 10
+#' x1 <- seq(-5,10,length.out = n)
+#' x2 <- seq(0,15,length.out = n)
+#' x <- expand.grid(x1,x2)
+#' x <- as.matrix(x)
+#' d2 <- c(0.01,0.2,0,0) #here we set the theta parameters to be 0.01 and 0.2.
+#' # These are the modes of the distribution that we will sample from using MCMC
+#' cor.par <- data.frame(matrix(data = d2,nrow = dim(x)[2],ncol = 2))
+#' names(cor.par) <- c("Theta.y","Alpha.y")
+#'
+#' R <- cor.matrix(x,cor.par) # obtain covariance matrix
+#' L <- chol(R)
+#' z <- as.matrix(rnorm(n^2))
+#' y <- L%*%z
+#'
+#' # gp <- bceMCMC_mvrnorm_2(1000,10,10,x,y,reg = "constant",step =1, priortheta = "Exp")
+#' # mean(gp$mcmc.ma[,2]) #these means should be similar to the theta parameters set above
+#' # mean(gp$mcmc.ma[,1])
 bceMCMC_mvrnorm_2 <-function(nmcmc,burn,thin,x,y,reg,step, priortheta){
 
-  #here we read in a matrix of the maximum likelihood estimators for the correlation coefficients, theta and alpha.
-  # maximum likelihood estimators for theta values are used as initial estimates for the metropolis hastings algorithm
-
-  cor.par <- read.mtx("corpar.mtx")
-  cor.par <- cor.par[,-1]
+  ddd <- c(rep(1,dim(x)[2]),rep(0,dim(x)[2]))
+  cor.par <- data.frame(matrix(data = ddd,nrow = dim(x)[2],ncol = 2))
+  names(cor.par) <- c("Theta.y","Alpha.y")
   cor.par2 <- cor.par
-  f <- as.matrix(rep(1,dim(x)[1]))
 
 
-  hess <- hessFBI(x,y,f,cor.par)
- cov1 <- -solve(hess)
+#   write.mtx(x,paste(system.file("bin", package = "proj2"),"/x1.mtx", sep = ""))
+#   write.mtx(y,paste(system.file("bin", package = "proj2"),"/y1.mtx", sep = ""))
+#   system(paste(system.file("bin", "gasp", package = "proj2"),system.file("bin", "fit.gsp", package = "proj2")))
+  corp <- read.mtx(system.file("bin", "corpar2.mtx", package = "proj2"))
+
+  corp <- corp[,-1]
 
   p<-ncol(x)
   j=0
 
+  f <- as.matrix(rep(1,dim(x)[1]))
+  hess <- hessFBI(x,y,f,corp)
+  cov1 <- -solve(hess)
 
 
   #final mcmc trials
@@ -59,7 +85,7 @@ bceMCMC_mvrnorm_2 <-function(nmcmc,burn,thin,x,y,reg,step, priortheta){
       phi.cond<-phi
       d <- 0
       while(d == 0){
-        phi.cond <- log(phi)+mvrnorm(n = 1,rep(0, p),cov1)
+        phi.cond <- log(phi)+MASS::mvrnorm(n = 1,rep(0, p),cov1)
         if(all(exp(phi.cond) > 0)){
           d <- 1
         }
@@ -80,7 +106,7 @@ bceMCMC_mvrnorm_2 <-function(nmcmc,burn,thin,x,y,reg,step, priortheta){
         phi_cond=phi.cond
         cor.par[,1] <- phi_cond
         cor.par2[,1] <- phi_or
-        com.phi <- log.posterior(x,y,as.matrix(rep(1,dim(x)[1])),cor.par, prior = "Exp") - log.posterior(x,y,as.matrix(rep(1,dim(x)[1])),cor.par2, prior = "Exp")
+        com.phi <- log_posterior(x,y,as.matrix(rep(1,dim(x)[1])),cor.par, prior = "Exp") - log_posterior(x,y,as.matrix(rep(1,dim(x)[1])),cor.par2, prior = "Exp")
         u<-runif(1)
         if(log(u)<com.phi){
           phi<-phi.cond

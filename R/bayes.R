@@ -1,20 +1,34 @@
-# necessary to execute function
-# source("cor.R")
-# source("readmtx.R")
-
-# x <- read.mtx("x.mtx")
-# y <- read.mtx("y.mtx")
-# f <- read.mtx("F.mtx")
-# cor.par <- read.mtx("corpar.mtx")
-
-# f <- as.matrix(f)
-# y <- as.matrix(y)
-
-# cor.par <- cor.par[, -1]
-
 #takes non-transformed theta parameters
-
-log.posterior <- function(x, y, f, cor.par, prior)
+#' log.posterior for gaussian process for x,y, and f, at the given correlation hyperparameters specified in cor.par
+#'
+#' @param x covariate matrix/vector x
+#' @param y response vector y
+#' @param f regression model, must be a matrix. If constant, should be a vector (as.matrix) of 1s of length n, where n is the number of data points in x
+#' @param cor.par matrix of theta and alpha parameters for power-exponential model, includes two columns, the first for theta parameters and the second for alpha parameters.  For Guassian correlation structure, alpha parameters can be initialized as 0.
+#' @param prior prior for log-posterior, options are "Exp" for exponential prior and "Hig" for Higdon's prior
+#'
+#' @return returns the log-posterior
+#' @export
+#'
+#' @examples n <- 5
+#' x1 <- seq(-5,10,length.out = n)
+#' x2 <- seq(0,15,length.out = n)
+#'
+#' data1 <- expand.grid(x1,x2)
+#' x <- data1
+#' # create hyperparameter matrix of thetas and alphas, alphas set to 0 indicated guassian correlation
+#' d2 <- c(0.01,0.2,0,0)
+#' cor.par <- data.frame(matrix(data = d2,nrow = dim(x)[2],ncol = 2))
+#' names(cor.par) <- c("Theta.y","Alpha.y")
+#'
+#'
+#' R <- cor.matrix(data1,cor.par) # obtain covariance matrix
+#' L <- chol(R)
+#' z <- as.vector(rnorm(n^2))
+#' y <- t(L)%*%z
+#'
+#' logpost <- log_posterior(data1,y,as.matrix(rep(1,n^2)),cor.par,prior = "Exp")
+log_posterior <- function(x, y, f, cor.par, prior)
 {
      R <- cor.matrix(x, cor.par)
 

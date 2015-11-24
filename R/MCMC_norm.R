@@ -1,23 +1,49 @@
-#### MCMC 2, normally distributed steps rather than uniformly distributed steps
+#### MCMC 2, normally distributed Metropolis algorithm proposal step lengths.
 # code for sampling gaussian correlation parameters in a gaussian process
+##### MCMC code for sampling gaussian correlation parameters in a gaussian process
 
-#read.mtx function for reading in matrix files
-# source("readmtx.R")
-
-#here we read in a matrix of the maximum likelihood estimators for the correlation coefficients, theta and alpha.
-# maximum likelihood estimators for theta values are used as initial estimates for the metropolis hastings algorithm
-
-# cor.par <- read.mtx("corpar.mtx")
-# cor.par <- cor.par[,-1]
-# cor.par2 <- cor.par
-
+#' Univariate, Normally distributed step length MCMC function, meant only to be used by gpMCMC function
+#'
+#' @param nmcmc number of MCMC samples to be generated before thinning and burning
+#' @param burn number of mcmc samples to burn
+#' @param thin keep one of every 'thin' samples
+#' @param x covariates
+#' @param y response
+#' @param reg only option currently is "constant"
+#' @param step step length for mcmc
+#' @param priortheta only option currently is "Exp"
+#'
+#' @return returns a list containing mcmc.ma (samples) and accept (acceptance rates)
+#' @export
+#'
+#' @examples
+#'
+#' nsamp <- 100
+#' burn <- 200
+#' thin <- 10
+#'
+#' n <- 10
+#' x1 <- seq(-5,10,length.out = n)
+#' x2 <- seq(0,15,length.out = n)
+#' x <- expand.grid(x1,x2)
+#' d2 <- c(0.01,0.2,0,0) #here we set the theta parameters to be 0.01 and 0.2.
+#' # These are the modes of the distribution that we will sample from using MCMC
+#' cor.par <- data.frame(matrix(data = d2,nrow = dim(x)[2],ncol = 2))
+#' names(cor.par) <- c("Theta.y","Alpha.y")
+#'
+#' R <- cor.matrix(x,cor.par) # obtain covariance matrix
+#' L <- chol(R)
+#' z <- as.matrix(rnorm(n^2))
+#' y <- L%*%z
+#'
+#' gp <- bceMCMC_norm(1000,10,10,x,y,reg = "constant",step =0.1, priortheta = "Exp")
+#' mean(gp$mcmc.ma[,2]) #these means should be similar to the theta parameters set above
+#' mean(gp$mcmc.ma[,1])
 bceMCMC_norm <-function(nmcmc,burn,thin,x,y,reg,step, priortheta){
 
-  #here we read in a matrix of the maximum likelihood estimators for the correlation coefficients, theta and alpha.
-  # maximum likelihood estimators for theta values are used as initial estimates for the metropolis hastings algorithm
-
-  cor.par <- read.mtx("corpar.mtx")
-  cor.par <- cor.par[,-1]
+  ddd <- c(rep(1,dim(x)[2]),rep(0,dim(x)[2]))
+  cor.par <- data.frame(matrix(data = ddd,nrow = dim(x)[2],ncol = 2))
+  names(cor.par) <- c("Theta.y","Alpha.y")
   cor.par2 <- cor.par
 
   p<-ncol(x)
@@ -61,7 +87,7 @@ bceMCMC_norm <-function(nmcmc,burn,thin,x,y,reg,step, priortheta){
           #com.phi<-log.post1.constant(x,y,phi_cond, priortheta)$logpost-log.post1.constant(x,y,phi_or, priortheta)$logpost
           cor.par[,1] <- phi_cond
           cor.par2[,1] <- phi_or
-          com.phi <- log.posterior(x,y,as.matrix(rep(1,dim(x)[1])),cor.par, prior = "Exp") - log.posterior(x,y,as.matrix(rep(1,dim(x)[1])),cor.par2, prior = "Exp")
+          com.phi <- log_posterior(x,y,as.matrix(rep(1,dim(x)[1])),cor.par, prior = "Exp") - log_posterior(x,y,as.matrix(rep(1,dim(x)[1])),cor.par2, prior = "Exp")
           u<-runif(1)
           if(log(u)<com.phi){
             phi<-phi.cond

@@ -1,4 +1,19 @@
-write.mtx <- function(x, filename, row.name = dimnames(x)[[1]], 
+#' For writing out matrix files to be read by gasp software
+#'
+#' @param x matrix to be written
+#' @param filename intended name of matrix file, should end with ".mtx"
+#' @param row.name optional vector indicating row-names, by default set to row-number
+#' @param col.name optional vector indicating column-names, by default set to x1, x2, etc
+#' @param page.width default = 80 characters
+#'
+#' @return returns nothing
+#' @export
+#'
+#' @examples
+#'
+#' x <- c(1:3)
+#' write.mtx(x,"x.mtx")
+write.mtx <- function(x, filename, row.name = dimnames(x)[[1]],
    col.name = dimnames(x)[[2]], page.width = 80)
 # Write matrix / data frame x to filename in blocked ACED/GaSP format.
 # Row and column labels are preserved if present.
@@ -8,9 +23,9 @@ write.mtx <- function(x, filename, row.name = dimnames(x)[[1]],
 # 1997.01.24: replaced with new version.
 # 2001.11.08: Renamed write.mx (from write.mat).
 # 2002.10.17: Renamed write.mtx (from write.mx).
-# 2007.03.04: Handling of row and column names changed. Argument row.name 
-#             introduced (set to all elements to "" for no row labels); 
-#             argumment col.name now allows a vector.  
+# 2007.03.04: Handling of row and column names changed. Argument row.name
+#             introduced (set to all elements to "" for no row labels);
+#             argumment col.name now allows a vector.
 {
      # Make sure x is a matrix.
      x <- as.matrix(x)
@@ -19,9 +34,9 @@ write.mtx <- function(x, filename, row.name = dimnames(x)[[1]],
      ncolumns <- ncol(x)
 
      # Row labels
-     if (!is.null(row.name)) 
-          row.labels <- row.name 
-     else 
+     if (!is.null(row.name))
+          row.labels <- row.name
+     else
           row.labels <- dimnames(x)[[1]]
      if (is.null(row.labels))
           row.labels <- c(1:nrows)
@@ -38,7 +53,7 @@ write.mtx <- function(x, filename, row.name = dimnames(x)[[1]],
      if (is.null(col.labels))
           col.labels <- paste("x", 1:ncolumns, sep="")
 
-     spaces <- c(rep("   ", ncolumns))
+     spaces <- c(rep("----", ncolumns))
 
      mat <- rbind(spaces, col.labels, spaces, x)
      dimnames(mat) <- list(row.labels, c(rep(" ", ncol(mat))))

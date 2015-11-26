@@ -24,13 +24,17 @@
 #' fitGauss(x,y)
 fitGauss <- function(x,y){
 
-#   write.mtx(x,paste(system.file("bin", package = "proj2"),"/x1.mtx", sep = ""))
-#   write.mtx(y,paste(system.file("bin", package = "proj2"),"/y1.mtx", sep = ""))
-#   system(paste(system.file("bin", "gasp", package = "proj2"),system.file("bin", "fit.gsp", package = "proj2")))
+#    write.mtx(x,paste(system.file("bin", package = "gpMCMC"),"/x1.mtx", sep = ""))
+#    write.mtx(y,paste(system.file("bin", package = "gpMCMC"),"/y1.mtx", sep = ""))
+#    system(paste(system.file("bin", "gasp", package = "gpMCMC"),system.file("bin", "fit.gsp", package = "gpMCMC")))
 
-  corp <- read.mtx(system.file("bin", "corpar2.mtx", package = "proj2"))
+	write.mtx(x,"x1.mtx")
+	write.mtx(y,"y1.mtx")
+	#system("./gasp fit.gsp")
+	system(paste(system.file("bin", "gasp", package = "gpMCMC"),system.file("bin", "fit.gsp", package = "gpMCMC")))
+
+  corp <- read.mtx("corpar2.mtx")
 
   thetas <- corp[,2]
   return(thetas)
-
 }

@@ -36,9 +36,7 @@ log_posterior <- function(x, y, f, cor.par, prior)
      n <- nrow(R)
      k <- dim(f)[2]
 
-
-
-    U1<-try(chol(R),silent=T)
+    U1<-try(chol(R),silent=T)  # catch error, if error is caught return a huge number.
 	F1=mat.or.vec(n,1)+1
 	S=backsolve(U1,F1,transpose=T)
 	S1=crossprod(S)

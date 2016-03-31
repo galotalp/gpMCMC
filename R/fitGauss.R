@@ -27,14 +27,31 @@ fitGauss <- function(x,y){
 #    write.mtx(x,paste(system.file("bin", package = "gpMCMC"),"/x1.mtx", sep = ""))
 #    write.mtx(y,paste(system.file("bin", package = "gpMCMC"),"/y1.mtx", sep = ""))
 #    system(paste(system.file("bin", "gasp", package = "gpMCMC"),system.file("bin", "fit.gsp", package = "gpMCMC")))
+# 
+# 	write.mtx(x,"x1.mtx")
+# 	write.mtx(y,"y1.mtx")
+# 	#system("./gasp fit.gsp")
+# 	system(paste(system.file("bin", "gasp", package = "gpMCMC"),system.file("bin", "fit.gsp", package = "gpMCMC")))
+# 
+#   corp <- read.mtx("corpar2.mtx")
+# 
+#   thetas <- corp[,2]
+	
+	
+	
+	likelihood2 <- function(thetas){
+		cor.par[,1] <- thetas
+		tryCatch({-log_posterior(x,y,as.matrix(rep(1,dim(x)[1])),cor.par, prior = "Exp")}, error = function(err){return(1000000000)}, finally = {#do nothing})
+		})
+	}
+	
+	ddd <- c(rep(1,dim(x)[2]),rep(0,dim(x)[2]))
+	cor.par <- data.frame(matrix(data = ddd,nrow = dim(x)[2],ncol = 2))
+	names(cor.par) <- c("Theta.y","Alpha.y")
+	
+	thetas <- rep(0.1,dim(x)[2])
+	thetas <- optim(thetas,likelihood2)$par
+	
 
-	write.mtx(x,"x1.mtx")
-	write.mtx(y,"y1.mtx")
-	#system("./gasp fit.gsp")
-	system(paste(system.file("bin", "gasp", package = "gpMCMC"),system.file("bin", "fit.gsp", package = "gpMCMC")))
-
-  corp <- read.mtx("corpar2.mtx")
-
-  thetas <- corp[,2]
   return(thetas)
 }

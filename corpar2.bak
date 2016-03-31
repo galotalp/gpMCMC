@@ -4,5 +4,5 @@ Estimated correlation parameters.
 Case  Term  Theta.x1  Alpha.x1
 ------------------------------
 
-   1  Var1   2.16912         0
-   2  Var2   1.97973         0
+   1  Var1  1.718070         0
+   2  Var2  0.671499         0

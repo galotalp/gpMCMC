@@ -3,7 +3,8 @@ Title: Generate MCMC or FBI samples from the posterior distribution of Gaussian 
 Version: 0.0.0.9000
 Authors@R: person("Gal", "Av-Gay", email = "galotalp@stat.ubc.ca", role = c("aut", "cre"))
 Description: Gaussian Process posterior distributions are often difficult to sample from.  We offer a series of MCMC sampling methods that use the Metropolis algorithm to sample from posterior distributions that use a Gaussian Correlation function and an Exponential prior.  Essentially, our MCMC functions sample from the posterior distribution of the correlation hyperparameters in the gaussian correlation function.
-Depends: 
+Depends:
+		MASS
     R (>= 3.2.2)
 License: MIT + file LICENSE
 LazyData: true

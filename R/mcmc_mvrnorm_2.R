@@ -45,21 +45,21 @@ bceMCMC_mvrnorm_2 <-function(nmcmc,burn,thin,x,y,reg,step, priortheta){
   ddd <- c(rep(1,dim(x)[2]),rep(0,dim(x)[2]))
   cor.par <- data.frame(matrix(data = ddd,nrow = dim(x)[2],ncol = 2))
   names(cor.par) <- c("Theta.y","Alpha.y")
+
+  cor.par[,1] <- fitGauss(x,y)
   cor.par2 <- cor.par
 
 
 #   write.mtx(x,paste(system.file("bin", package = "proj2"),"/x1.mtx", sep = ""))
 #   write.mtx(y,paste(system.file("bin", package = "proj2"),"/y1.mtx", sep = ""))
 #   system(paste(system.file("bin", "gasp", package = "proj2"),system.file("bin", "fit.gsp", package = "proj2")))
-  corp <- read.mtx(system.file("bin", "corpar2.mtx", package = "proj2"))
 
-  corp <- corp[,-1]
 
   p<-ncol(x)
   j=0
 
   f <- as.matrix(rep(1,dim(x)[1]))
-  hess <- hessFBI(x,y,f,corp)
+  hess <- hessFBI(x,y,f,cor.par)
   cov1 <- -solve(hess)
 
 

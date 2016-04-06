@@ -3,10 +3,10 @@
 
 	# you need to do the following before running this function:
 	# Read in the following matrices:
-	#cor.par <- read.mtx("corpar.mtx") these are theta values, not tau values
-	#x <- read.mtx("x.mtx")
-	#y <- read.mtx("y.mtx")
-	#f <- read.mtx("F.mtx")
+#	#cor.par <- read.mtx("corpar.mtx") these are theta values, not tau values
+#	#x <- read.mtx("x.mtx")
+#	#y <- read.mtx("y.mtx")
+#	#f <- read.mtx("F.mtx")
 	# Remove "Term" column
 	# cor.par <- cor.par[, -1]
 

@@ -6,7 +6,7 @@ Description: Gaussian Process posterior distributions are often difficult to sam
 Depends:
     R (>= 3.2.2)
 License: MIT + file LICENSE
-LazyData: true
+LazyData: false
 RoxygenNote: 5.0.1
 Suggests: testthat,
     knitr,

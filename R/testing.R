@@ -1,4 +1,3 @@
-library(gpMCMC)
 
 n <- 10
 x1 <- seq(-5,10,length.out = n)
